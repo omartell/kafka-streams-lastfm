@@ -75,7 +75,7 @@
 (defn smap-by-count []
   (sorted-map-by #(> (:count %1) (:count %2))))
 
-(defn top-tracks [v]
+(defn top-10-tracks [v]
   (->> (mapcat :tracks v)
        (group-by identity)
        (map (fn [[k v]]
@@ -163,32 +163,14 @@
                                     "top-sessions-by-tracks")
                         (.mapValues (reify ValueMapper
                                       (apply[_ v]
-                                        (log/info "Top tracks" (top-tracks v))
-                                        (top-tracks v))))
+                                        (log/info "Top tracks" (top-10-tracks v))
+                                        (top-10-tracks v))))
                         (.toStream)
                         (.to (Serdes/String) (JsonSerde.) (str "top-ten-tracks-" app-id)))
         streams     (KafkaStreams. builder config)]
     (log/info "Staring streams task")
     (.start streams)
     streams))
-
-(defn top-sessions-tsv [top-sessions]
-  (spit "top_sessions.tsv" (->> top-sessions
-                                (map (fn [[user-id start end count]] [user-id
-                                                                      (str (time-coerce/from-long start))
-                                                                      (str (time-coerce/from-long end))
-                                                                      count]))
-                                (into [["user-id" "session-start" "session-end" "tracks-count"]])
-                                (map (fn [v] (string/join "\t" v)))
-                                (string/join "\n"))))
-
-
-(defn top-tracks-tsv [top-tracks]
-  (spit "top_tracks.tsv" (->> top-tracks
-                              (map vals)
-                              (into [["track-name" "times-played"]])
-                              (map (fn [v] (string/join "\t" v)))
-                              (string/join "\n"))))
 
 (defn -main [& args]
   (run))
