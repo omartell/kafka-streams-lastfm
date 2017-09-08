@@ -1,0 +1,20 @@
+<!-- Logback Configuration. See http://logback.qos.ch/ -->
+<configuration>
+
+   <!-- Console (STDOUT) output. -->
+  <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- Default encoder is ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+    <encoder>
+      <pattern>%-6level [%d{HH:mm:ss.SSS}] %logger{5} - %msg %n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="kafka-streams-lastfm.core" level="DEBUG" />
+  <root level="INFO">
+    <appender-ref ref="CONSOLE" />
+  </root>
+
+  <logger name="org.apache.kafka.clients" level="WARN" />
+  <logger name="org.apache.kafka.common" level="WARN" />
+
+</configuration>
